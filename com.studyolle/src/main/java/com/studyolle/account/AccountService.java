@@ -1,6 +1,5 @@
 package com.studyolle.account;
 
-import com.studyolle.config.AppConfig;
 import com.studyolle.domain.Account;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
