@@ -20,6 +20,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .mvcMatchers(HttpMethod.GET, "/profile/*").permitAll()
                 .anyRequest().authenticated();
 
+
         http.formLogin()
                 .loginPage("/login").permitAll();
         http.logout()
@@ -30,6 +31,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) throws Exception {
         web.ignoring()
                 .mvcMatchers("/node_modules/**")
+                .antMatchers("/favicon.ico", "/resources/**", "/error")
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations());
+        web.ignoring().antMatchers("/favicon.ico", "/resources/**", "/error");
     }
+
+
 }
