@@ -44,14 +44,14 @@ public class Account {
     private String profileImage;
 
     private boolean studyCreateByEmail;
-    private boolean studyCreateByWeb;
+    private boolean studyCreateByWeb = true;
 
     private boolean studyEnrollmentResultByEmail;
-    private boolean studyEnrollmentResultByWeb;
+    private boolean studyEnrollmentResultByWeb = true;
 
 
     private boolean studyUpdatedBtyEmail;
-    private boolean studyUpdatedBtyWeb;
+    private boolean studyUpdatedBtyWeb = true;
 
     private LocalDateTime emailCheckTokenGeneratedAt;
 
