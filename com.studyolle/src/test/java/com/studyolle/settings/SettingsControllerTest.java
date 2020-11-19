@@ -149,7 +149,7 @@ class SettingsControllerTest {
                 .andExpect(redirectedUrl(SettingsController.SETTINGS_ACCOUNT_URL))
                 .andExpect(flash().attributeExists("message"));
 
-        assertNotNull(accountRepository.findByNickname("ko"));
+        assertNotNull(accountRepository.findByNickname("kys"));
     }
 
     @WithAccount("ko")
