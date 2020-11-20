@@ -2,6 +2,7 @@ package com.studyolle.zone;
 
 import com.studyolle.domain.Zone;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
