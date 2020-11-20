@@ -1,26 +1,32 @@
 package com.studyolle.settings;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.studyolle.WithAccount;
 import com.studyolle.account.AccountRepository;
+import com.studyolle.account.AccountService;
 import com.studyolle.domain.Account;
+import com.studyolle.domain.Tag;
+import com.studyolle.settings.form.TagForm;
+import com.studyolle.tag.TagRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
-import static com.studyolle.settings.SettingsController.SETTINGS_PASSWORD_URL;
-import static com.studyolle.settings.SettingsController.SETTINGS_PROFILE_URL;
-
+import static com.studyolle.settings.SettingsController.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@Transactional
 @SpringBootTest
 @AutoConfigureMockMvc
 class SettingsControllerTest {
@@ -28,11 +34,70 @@ class SettingsControllerTest {
     @Autowired MockMvc mockMvc;
     @Autowired AccountRepository accountRepository;
     @Autowired PasswordEncoder passwordEncoder;
+    @Autowired ObjectMapper objectMapper;
+    @Autowired TagRepository tagRepository;
+    @Autowired AccountService accountService;
 
     @AfterEach
     void afterEach() {
         accountRepository.deleteAll();
     }
+
+    @Test
+    @DisplayName("태그 수정 폼")
+    @WithAccount("ko")
+    void updateTagsForm() throws Exception {
+        String bio = "짧은 소개를 수정";
+        mockMvc.perform(get(SETTINGS_TAGS_URL))
+                .andExpect(view().name(SETTINGS_TAGS_VIEW_NAME))
+                .andExpect(model().attributeExists("account"))
+                .andExpect(model().attributeExists("whitelist"))
+                .andExpect(model().attributeExists("tags"));
+
+    }
+
+    @Test
+    @DisplayName("태그 추가")
+    @WithAccount("ko")
+    void addTag() throws Exception {
+
+        TagForm tagForm = new TagForm();
+        tagForm.setTagTitle("newTag");
+
+        mockMvc.perform(post(SETTINGS_TAGS_URL + "/add")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(tagForm))
+                .with(csrf()))
+                .andExpect(status().isOk());
+
+        Tag newTag = tagRepository.findByTitle("newTag");
+        assertNotNull(newTag);
+        assertTrue(accountRepository.findByNickname("ko").getTags().contains(newTag));
+    }
+
+    @Test
+    @DisplayName("태그 제거")
+    @WithAccount("ko")
+    void removeTag() throws Exception {
+        Account ko = accountRepository.findByNickname("ko");
+        Tag newTag = tagRepository.save(Tag.builder().title("newTag").build());
+        accountService.addTag(ko,newTag);
+
+        assertTrue(ko.getTags().contains(newTag));
+
+        TagForm tagForm = new TagForm();
+        tagForm.setTagTitle("newTag");
+
+        mockMvc.perform(post(SETTINGS_TAGS_URL + "/remove")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(tagForm))
+                .with(csrf()))
+                .andExpect(status().isOk());
+
+        assertFalse(accountRepository.findByNickname("ko").getTags().contains(newTag));
+    }
+
+
 
     @Test
     @DisplayName("프로필 수정 폼")
