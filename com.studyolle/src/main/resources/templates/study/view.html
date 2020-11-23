@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="fragments.html :: head"></head>
@@ -14,10 +15,6 @@
 
     <div th:replace="fragments.html :: footer"></div>
 </div>
-<script type="application/javascript">
-        $(function () {
-            $('[data-toggle="tooltip"]').tooltip()
-        })
-    </script>
+<script th:replace="fragments.html :: tooltip"></script>
 </body>
 </html>
